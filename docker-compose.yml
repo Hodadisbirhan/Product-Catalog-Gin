@@ -1,0 +1,39 @@
+# docker-compose.yml
+version: "3.8"
+
+services:
+  api:
+    build: .
+    container_name: catalog-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    # volumes:
+    #   - .:/app
+    networks:
+      - backend
+
+  db:
+    image: postgres:14
+    container_name: catalog-db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: gin_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+volumes:
+  pgdata:
+
+networks:
+  backend:
+    driver: bridge

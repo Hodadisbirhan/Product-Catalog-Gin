@@ -1,0 +1,46 @@
+# Binaries
+/main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Vendor directory (optional, if you want to keep vendor in git, remove this)
+vendor/
+
+# Dependency directories
+/pkg/mod/
+
+# Go workspace file
+go.work
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+*.log
+
+# Build output
+dist/
+build/
+
+# Coverage reports
+coverage.out
+
+# Temporary files
+*.tmp
+*.temp
