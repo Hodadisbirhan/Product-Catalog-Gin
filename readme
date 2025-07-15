@@ -1,0 +1,11 @@
+handler/ → for HTTP handlers/controllers
+
+model/ → for domain models and structs
+
+config/ → for environment and database config
+
+utils/ → for reusable helper functions
+
+router/ → for route setup
+middleware -> for intercept HTTP requests to perform tasks like authentication, authorization, error handling, and logging before reaching the final handler
+main.go → as entry point
