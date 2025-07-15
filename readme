@@ -1,3 +1,5 @@
+Gin and Postgres
+
 handler/ → for HTTP handlers/controllers
 
 model/ → for domain models and structs
