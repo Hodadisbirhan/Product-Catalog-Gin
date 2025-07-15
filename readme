@@ -9,3 +9,13 @@ utils/ → for reusable helper functions
 router/ → for route setup
 middleware -> for intercept HTTP requests to perform tasks like authentication, authorization, error handling, and logging before reaching the final handler
 main.go → as entry point
+
+
+create environment variable at root .env and add the following variable
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+POSTGRES_DB=gin_db
+DB_HOST=db
+DB_PORT=5432
+JWT_SECRET=yourSuperSecretKey
+DB_URL=postgres://user:password@db:5432/gin_db?sslmode=disable
