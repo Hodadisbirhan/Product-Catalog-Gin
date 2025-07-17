@@ -7,7 +7,7 @@
 *.dylib
 
 # Vendor directory (optional, if you want to keep vendor in git, remove this)
-vendor/
+# vendor/
 
 # Dependency directories
 /pkg/mod/
