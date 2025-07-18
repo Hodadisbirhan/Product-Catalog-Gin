@@ -8,19 +8,20 @@ import (
 )
 
 func SetupRouter() *gin.Engine {
-    r := gin.Default()
-	r.GET("/", handler.GetTableCount) 
-    r.POST("/login", handler.Login)
- // Default route returns table count
+	r := gin.Default()
+	r.GET("/", handler.GetTableCount)
+	r.POST("/login", handler.Login)
+	r.POST("/register", handler.Register)
+	// Default route returns table count
 
-    auth := r.Group("/")
-    auth.Use(middleware.AuthMiddleware())
-    {
-        auth.GET("/profile", handler.Profile)
-        auth.GET("/admin-only", middleware.RequirePermission("view_admin"), func(c *gin.Context) {
-            c.JSON(200, gin.H{"message": "You have access!"})
-        })
-    }
+	auth := r.Group("/")
+	auth.Use(middleware.AuthMiddleware())
+	{
+		auth.GET("/profile", handler.Profile)
+		auth.GET("/admin-only", middleware.RequirePermission("view_admin"), func(c *gin.Context) {
+			c.JSON(200, gin.H{"message": "You have access!"})
+		})
+	}
 
-    return r
+	return r
 }
