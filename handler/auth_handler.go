@@ -40,16 +40,32 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.GenerateJWT(user.ID)
+	accessToken, err := utils.AccessTokenGenerate(user.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token generation failed"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Access token generation failed"})
+		return
+	}
+
+	refreshToken, err := utils.RefreshTokenGenerate(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Refresh token generation failed"})
 		return
 	}
 
 	c.SetCookie(
 		"access",
-		token,
-		3600,
+		accessToken,
+		900, // 15 minutes
+		"/",
+		"localhost",
+		false,
+		true,
+	)
+
+	c.SetCookie(
+		"refresh",
+		refreshToken,
+		172800, // 48 hours
 		"/",
 		"localhost",
 		false,
@@ -104,16 +120,32 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.GenerateJWT(user.ID)
+	accessToken, err := utils.AccessTokenGenerate(user.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Token generation failed"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Access token generation failed"})
+		return
+	}
+
+	refreshToken, err := utils.RefreshTokenGenerate(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Refresh token generation failed"})
 		return
 	}
 
 	c.SetCookie(
 		"access",
-		token,
-		3600,
+		accessToken,
+		900, // 15 minutes
+		"/",
+		"localhost",
+		false,
+		true,
+	)
+
+	c.SetCookie(
+		"refresh",
+		refreshToken,
+		172800, // 48 hours
 		"/",
 		"localhost",
 		false,

@@ -8,13 +8,34 @@ import (
 	"github.com/google/uuid"
 )
 
-var jwtKey = []byte(os.Getenv("JWT_SECRET"))
+func CreateJWT(claims jwt.MapClaims, isAccess bool) (string, error) {
 
-func GenerateJWT(userID uuid.UUID) (string, error) {
-	claims := jwt.MapClaims{
-		"user_id": userID.String(),
-		"exp":     time.Now().Add(24 * time.Hour).Unix(),
+	jwtKey := []byte(os.Getenv("JWT_SECRET"))
+
+	if isAccess {
+		accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+		accessTokenString, err := accessToken.SignedString(jwtKey)
+
+		return accessTokenString, err
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtKey)
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	refreshTokenString, err := refreshToken.SignedString(jwtKey)
+
+	return refreshTokenString, err
+}
+
+func AccessTokenGenerate(userID uuid.UUID) (string, error) {
+	return CreateJWT(jwt.MapClaims{
+		"exp":     time.Now().Add(time.Minute * time.Duration(15)).Unix(),
+		"user_id": userID.String(),
+	}, true)
+}
+
+func RefreshTokenGenerate(userID uuid.UUID) (string, error) {
+	return CreateJWT(jwt.MapClaims{
+		"exp":     time.Now().Add(time.Hour * time.Duration(48)).Unix(),
+		"user_id": userID.String(),
+	}, false)
 }
