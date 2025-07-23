@@ -52,7 +52,7 @@ func Login(c *gin.Context) {
 		3600,
 		"/",
 		"localhost",
-		true,
+		false,
 		true,
 	)
 
@@ -116,7 +116,7 @@ func Register(c *gin.Context) {
 		3600,
 		"/",
 		"localhost",
-		true,
+		false,
 		true,
 	)
 

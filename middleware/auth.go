@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 
@@ -10,33 +11,52 @@ import (
 )
 
 func AuthMiddleware() gin.HandlerFunc {
-    return func(c *gin.Context) {
-        tokenString := c.GetHeader("Authorization")
-        if tokenString == "" {
-            c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing token"})
-            c.Abort()
-            return
-        }
+	return func(c *gin.Context) {
+		tokenString, err := c.Cookie("access")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "No access token provided"})
+				c.Abort()
+				return
+			}
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error retrieving access token"})
+			c.Abort()
+			return
+		}
 
-        token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-            return []byte(os.Getenv("JWT_SECRET")), nil
-        })
+		if tokenString == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing token"})
+			c.Abort()
+			return
+		}
 
-        if err != nil || !token.Valid {
-            c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-            c.Abort()
-            return
-        }
+		claims := jwt.MapClaims{}
+		_, err = jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method")
+			}
+			return []byte(os.Getenv("JWT_SECRET")), nil
+		})
 
-        claims := token.Claims.(jwt.MapClaims)
-        userID, err := uuid.Parse(claims["user_id"].(string))
-        if err != nil {
-            c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID"})
-            c.Abort()
-            return
-        }
+		// if err != nil || !token.Valid {
+		// 	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		// 	return
+		// }
 
-        c.Set("user_id", userID)
-        c.Next()
-    }
+		// ✅ Extract and convert user_id
+		userIDStr, ok := claims["user_id"].(string)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id in token"})
+			return
+		}
+
+		userID, err := uuid.Parse(userIDStr)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Malformed UUID in token"})
+			return
+		}
+
+		c.Set("user_id", userID)
+		c.Next()
+	}
 }
