@@ -49,3 +49,4 @@ func ConnectDB() {
 
 	log.Println("✅ Database migrated successfully")
 }
+
