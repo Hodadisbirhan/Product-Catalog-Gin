@@ -10,9 +10,15 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	r.GET("/", handler.GetTableCount)
+	// Default route returns table count
 	r.POST("/login", handler.Login)
 	r.POST("/register", handler.Register)
-	// Default route returns table count
+	r.GET("/auth/:provider", handler.BeginOAuth)
+
+	// Route to handle the callback from the OAuth provider after authentication.
+	// The provider redirects the user back to this URL.
+	// Example: GET /auth/google/callback will process the Google OAuth response.
+	r.GET("/auth/:provider/callback", handler.OAuthCallback)
 
 	auth := r.Group("/")
 	auth.Use(middleware.AuthMiddleware())
